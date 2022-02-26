@@ -12,10 +12,13 @@ router.get('/',async (req, res, next) => {
 // pay employee
 // TODO
 router.post('/',async (req, res, next) => {
-    const employeeId = req.body.employee_id;
-    console.log(employeeId);
+    const payroll = req.body;
 
-    res.status(StatusCodes.OK).json(employeeId);
+    const result = await db.query(`
+        INSERT INTO payroll (employee_id, amount)
+        VALUES ('${payroll.employeeId}', '${payroll.amount}');
+    `);
+    res.status(StatusCodes.OK).json(result);
 });
 
 

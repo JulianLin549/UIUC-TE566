@@ -4,8 +4,7 @@ const initQuery = `
     DROP TABLE IF EXISTS employee;
     CREATE TABLE employee (
         employee_id SERIAL PRIMARY KEY,
-        first_name VARCHAR(64),
-        last_name VARCHAR(64),
+        name VARCHAR(64),
         address VARCHAR(256),
         salary decimal(12,2),
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
@@ -29,6 +28,8 @@ const initQuery = `
         address VARCHAR(256),
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     );     
+    INSERT INTO "customer" ("company_name", "name", "address", "created_at") VALUES
+    ('company1', 'julian lin', '5098e uni ave', '2022-02-26 06:42:07.756923+00');
     
     DROP TABLE IF EXISTS payroll;
     CREATE TABLE payroll (

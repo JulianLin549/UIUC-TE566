@@ -7,6 +7,7 @@ const express = require('express'),
 // get all customers
 router.get('/',async (req, res, next) => {
     const result = await db.query('select * from customer');
+    console.log(result)
     res.status(StatusCodes.OK).json(result);
 });
 
@@ -15,8 +16,8 @@ router.post('/',async (req, res, next) => {
     const newCustomer = req.body;
     console.log(newCustomer);
     const result = await db.query(`
-        INSERT INTO customer (company_name, part, name, address)
-        VALUES ('${newCustomer.company_name}', '${newCustomer.part}', '${newCustomer.name}', '${newCustomer.address}');
+        INSERT INTO customer (company_name, name, address)
+        VALUES ('${newCustomer.companyName}', '${newCustomer.name}', '${newCustomer.address}');
     `);
     res.status(StatusCodes.OK).json(result);
 });

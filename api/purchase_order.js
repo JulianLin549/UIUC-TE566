@@ -8,7 +8,7 @@ const express = require('express'),
 
 // get all purchase order history
 router.get('/',async (req, res, next) => {
-    const result = await db.query('select * from payroll');
+    const result = await db.query('select * from purchase_order');
     res.status(StatusCodes.OK).json(result);
 });
 
@@ -19,8 +19,9 @@ router.post('/',async (req, res, next) => {
     const newPO = req.body;
     console.log(newPO);
     const result = await db.query(`
-        INSERT INTO purchase_order (part_id, part, quantity, unit_price, value)
-        VALUES ('${newPO.part_id}', '${newPO.quantity}', '${newPO.unit_price}', '${newPO.unit_price * newPO.quantity}');
+        INSERT INTO purchase_order (part_id, quantity, unit_price, value)
+        VALUES ('${newPO.partId}', '${newPO.quantity}', '${newPO.unitPrice}', '${newPO.value}');
     `);
     res.status(StatusCodes.OK).json(result);
 });
+module.exports = router

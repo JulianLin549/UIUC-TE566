@@ -16,8 +16,8 @@ router.post('/',async (req, res, next) => {
     console.log(newVendor);
     const result = await db.query(`
         INSERT INTO vendor (company_name, part, unit_price, address)
-        VALUES ('${newVendor.company_name}', '${newVendor.part}', 
-        '${newVendor.unit_price}', '${newVendor.address}');
+        VALUES ('${newVendor.companyName}', '${newVendor.part}', 
+        '${newVendor.unitPrice}', '${newVendor.address}');
     `);
     res.status(StatusCodes.OK).json(result);
 });
