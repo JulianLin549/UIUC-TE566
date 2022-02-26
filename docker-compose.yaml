@@ -1,0 +1,16 @@
+version: '3.6'   # Docker Engine release 18.02.0+
+services:
+  postgres:
+    image: postgres:13
+    restart: always
+    environment:
+      POSTGRES_USER: 'user'
+      POSTGRES_PASSWORD: 'password'
+    ports:
+      - "5432:5432"
+    expose:
+      - '5432'
+
+
+
+  
