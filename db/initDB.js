@@ -43,13 +43,17 @@ const initQuery = `
     CREATE TABLE inventory (
         item_id SERIAL PRIMARY KEY,
         part_name VARCHAR(64),
+        vendor_id VARCHAR(64),
         unit_price decimal(12,2),
         quantity integer,
         value decimal(20,2),
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     ); 
-    INSERT INTO inventory (part_name, unit_price, quantity, value)
-    VALUES ('Complete Product', 0, 0, 0);
+    INSERT INTO inventory (part_name, unit_price, quantity, value, vendor_id)
+    VALUES ('Complete Product', 10, 10000, 100000, '0');
+    
+    INSERT INTO inventory (part_name, vendor_id, unit_price, quantity, value, created_at) VALUES
+    ('r', '1', 1.00, 1, 1.00, '2022-02-27 04:16:10.320525+00');
     
     DROP TABLE IF EXISTS invoice;
     CREATE TABLE invoice (
@@ -60,20 +64,28 @@ const initQuery = `
         settlement boolean,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     ); 
-    INSERT INTO inventory (part_name, unit_price, quantity, value)
-    VALUES ('Complete Product', 0, 0, 0);
+    INSERT INTO invoice (customer_id, quantity, value, settlement, created_at) VALUES
+        ('1', 1000, 10000, 't', '2022-01-01 07:04:46.403439+00'),
+        ('1', 5000, 50000, 't', '2022-01-01 07:04:46.403439+00'),
+        ('1', 1000, 10000, 'f', '2022-01-01 07:04:46.403439+00'),
+        ('2', 5000, 50000, 'f', '2022-01-01 07:04:46.403439+00'),        
+        ('3', 2000, 20000, 'f', '2022-01-01 07:04:46.403439+00'),
+        ('4', 2000, 20000, 'f', '2022-01-01 07:04:46.403439+00');
+
     
     DROP TABLE IF EXISTS purchase_order;
     CREATE TABLE purchase_order (
         po_id SERIAL PRIMARY KEY,
-        part_id VARCHAR(64),
+        item_id VARCHAR(64),
+        vendor_id VARCHAR(64),
         quantity integer,
         unit_price decimal(12,2),
         value decimal(16,2),
         settlement boolean,
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     ); 
-    
+    INSERT INTO "purchase_order" ("item_id", "vendor_id", "quantity", "unit_price", "value", "settlement", "created_at") VALUES
+    ('1', '1', 50000, 1.00, 50000, 'f', '2022-01-01 07:04:46.403439+00');
     
     DROP TABLE IF EXISTS balance_sheet;
     CREATE TABLE balance_sheet (
@@ -85,21 +97,22 @@ const initQuery = `
         equipment decimal(16,2),
         payable decimal(16,2),
         mortgage decimal(16,2),
-        networth decimal(16,2)
+        created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     ); 
-    
+    INSERT INTO "balance_sheet" ("cash", "receivable", "inventory", "building", "equipment", "payable", "mortgage") VALUES
+    (2000000, 100000, 200000, 0, 0, 50000, 0);
+   
     DROP TABLE IF EXISTS income_statement;
     CREATE TABLE income_statement (
         is_id SERIAL PRIMARY KEY,
         sales decimal(16,2),
         cogs decimal(16,2),
-        gross_profit decimal(16,2),
         payroll decimal(16,2),
         bills decimal(16,2),
-        income_taxes decimal(16,2),
-        net_income decimal(16,2),
         created_at TIMESTAMPTZ NOT NULL DEFAULT NOW()
     ); 
+    INSERT INTO "income_statement" ("sales", "cogs", "payroll", "bills") VALUES   
+    (0.00, 0.00, 0.00, 0.00);
 `;
 
 const initDB = async () => {

@@ -15,10 +15,11 @@ router.get('/',async (req, res, next) => {
 router.post('/',async (req, res, next) => {
     const newCustomer = req.body;
     console.log(newCustomer);
-    const result = await db.query(`
-        INSERT INTO customer (company_name, name, address)
-        VALUES ('${newCustomer.companyName}', '${newCustomer.name}', '${newCustomer.address}');
-    `);
+
+    const result = await db.none(`
+        INSERT INTO customer (company_name, name, address) VALUES ($1, $2, $3)`,
+        [newCustomer.companyName, newCustomer.name, newCustomer.address]);
+
     res.status(StatusCodes.OK).json(result);
 });
 

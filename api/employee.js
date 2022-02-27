@@ -14,10 +14,10 @@ router.get('/',async (req, res, next) => {
 router.post('/',async (req, res, next) => {
     const newUser = req.body;
     console.log(newUser);
-    const result = await db.query(`
-        INSERT INTO employee (name, address, salary)
-        VALUES ('${newUser.name}', '${newUser.address}', '${newUser.salary}');
-    `);
+    const result = await db.none(`
+        INSERT INTO employee (name, address, salary) VALUES ($1, $2, $3)`,
+        [newUser.name, newUser.address, newUser.salary]);
+
     res.status(StatusCodes.OK).json(result);
 });
 
