@@ -4,15 +4,29 @@
 // TODO
 
 const express = require('express'),
-    router = express.Router();
+    router = express.Router(),
+    { StatusCodes } = require('http-status-codes'),
+    db = require('../db/connectDB');
+
 
 router.get('/balance-sheet',async (req, res) => {
-    console.log('BS');
-    res.status(StatusCodes.OK).json();
+    try{
+        const result = await db.one('select * from balance_sheet');
+        res.status(StatusCodes.OK).json(result);
+    } catch(e) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json();
+        console.log(e)
+    }
+
 });
 
 router.get('/income-statement',async (req, res) => {
-    console.log('IS');
-    res.status(StatusCodes.OK).json();
+    try{
+        const result = await db.one('select * from income_statement');
+        res.status(StatusCodes.OK).json(result);
+    } catch(e) {
+        res.status(StatusCodes.INTERNAL_SERVER_ERROR).json();
+        console.log(e)
+    }
 });
 module.exports = router
