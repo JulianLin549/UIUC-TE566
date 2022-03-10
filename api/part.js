@@ -4,19 +4,20 @@ const express = require('express'),
     db = require('../db/connectDB');
 
 
-// get all vendors
+// get all parts
 router.get('/',async (req, res, next) => {
-    const result = await db.query('select * from vendor');
+    const result = await db.any(`SELECT * FROM part INNER JOIN vendor
+                                       ON vendor.vendor_id::varchar = part.vendor_id;`);
+
     res.status(StatusCodes.OK).json(result);
 });
 
-// add new vendor
 router.post('/',async (req, res, next) => {
-    const newVendor = req.body;
-    console.log(newVendor);
+    const newPart = req.body;
+    console.log(newPart);
     const result = await db.none(`
-        INSERT INTO vendor (company_name, address) VALUES ($1, $2)`,
-        [newVendor.companyName, newVendor.address]);
+        INSERT INTO part (vendor_id, part_name, unit_price) VALUES ($1, $2, $3)`,
+        [newPart.vendorId, newPart.partName, newPart.unitPrice]);
 
     res.status(StatusCodes.OK).json(result);
 });

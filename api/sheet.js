@@ -11,7 +11,11 @@ const express = require('express'),
 
 router.get('/balance-sheet',async (req, res) => {
     try{
+        const inventoryValue = await db.one('select sum(value) from inventory');
+        console.log(inventoryValue)
         const result = await db.one('select * from balance_sheet');
+        result['inventory'] = inventoryValue.sum;
+        console.log(result)
         res.status(StatusCodes.OK).json(result);
     } catch(e) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json();
@@ -23,6 +27,7 @@ router.get('/balance-sheet',async (req, res) => {
 router.get('/income-statement',async (req, res) => {
     try{
         const result = await db.one('select * from income_statement');
+        console.log(result)
         res.status(StatusCodes.OK).json(result);
     } catch(e) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json();

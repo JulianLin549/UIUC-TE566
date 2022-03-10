@@ -6,7 +6,9 @@ const express = require('express'),
 // get all payroll history
 router.get('/',async (req, res, next) => {
     try{
-        const result = await db.any('select * from payroll');
+        const result = await db.any(`SELECT * FROM payroll INNER JOIN employee
+                                            ON employee.employee_id::varchar = payroll.employee_id;`);
+        console.log(result);
         res.status(StatusCodes.OK).json(result);
     } catch(e) {
         res.status(StatusCodes.INTERNAL_SERVER_ERROR).json();

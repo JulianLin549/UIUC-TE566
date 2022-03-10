@@ -19,28 +19,33 @@ router.post('/',async (req, res, next) => {
     try{
         // part name,
         const newPO = req.body;
-        console.log(newPO);
         // if item not in inventory, then add, else change quantity
-        const inventory_res = await db.query('select * from inventory where item_id = $1', [newPO.partId]);
+        const inventory_res = await db.one('select * from inventory where part_id = $1', [newPO.partId]);
+        console.log(inventory_res)
         if (inventory_res.length === 0){
-            return res.status(StatusCodes.OK).json({
-                error: "Item not found in inventory, please add manually"
-            });
+            await db.tx(async t => {
+                await t.query( `INSERT INTO inventory (part_id, part_name, vendor_id, unit_price, quantity, value) VALUES ($1, $2, $3, $4, $5, $6)`,
+                    [newPO.partId, newPO.partName, newPO.vendorId, newPO.unitPrice, newPO.quantity, newPO.value]);
+
+                await t.none(`INSERT INTO purchase_order (part_id, quantity, unit_price, value, settlement) VALUES ($1, $2, $3, $4, $5)`,
+                    [newPO.partId, newPO.quantity, newPO.unitPrice, newPO.value, false]);
+
+                const bs = await db.one('select * from balance_sheet where bs_id = 1');
+                await t.none('UPDATE balance_sheet SET payable = $1 WHERE bs_id = 1', [parseFloat(bs.payable) + parseFloat(newPO.value)]);
+            })
+        }else{
+            await db.tx(async t => {
+                await t.none(`INSERT INTO purchase_order (part_id, quantity, unit_price, value, settlement) VALUES ($1, $2, $3, $4, $5)`,
+                    [newPO.partId, newPO.quantity, newPO.unitPrice, newPO.value, false]);
+                const new_inv_quantity = parseInt(inventory_res.quantity) + parseInt(newPO.quantity);
+
+                const new_inv_value = parseFloat(inventory_res.value) + parseFloat(newPO.value);
+                const bs = await db.one('select * from balance_sheet where bs_id = 1');
+                await t.none('UPDATE inventory SET quantity = $1, value = $2 WHERE id = $3', [new_inv_quantity, new_inv_value, inventory_res.id]);
+                let newPayable = parseFloat(bs.payable) + parseFloat(newPO.value)
+                await t.none('UPDATE balance_sheet SET payable = $1 WHERE bs_id = 1', [newPayable]);
+            })
         }
-
-        await db.tx(async t => {
-            await t.none(`INSERT INTO purchase_order (item_id, vendor_id, quantity, unit_price, value, settlement) VALUES ($1, $2, $3, $4, $5, $6)`,
-                [newPO.partId, inventory_res[0].vendor_id, newPO.quantity, newPO.unitPrice, newPO.value, false]);
-            const new_inv_quantity = parseInt(inventory_res[0].quantity) + parseInt(newPO.quantity);
-
-            const new_inv_value = parseFloat(inventory_res[0].value) + parseFloat(newPO.value);
-            const bs = await db.one('select * from balance_sheet where bs_id = 1');
-            await t.none('UPDATE inventory SET quantity = $1, value = $2 WHERE item_id = $3', [new_inv_quantity, new_inv_value, inventory_res[0].item_id]);
-            await t.none('UPDATE balance_sheet SET payable = $1 WHERE bs_id = 1', [parseFloat(bs.payable) + parseFloat(newPO.value)]);
-
-        })
-
-
         return res.status(StatusCodes.OK).json();
     } catch (e){
         console.log(e)

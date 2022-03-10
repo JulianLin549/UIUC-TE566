@@ -12,8 +12,9 @@ router.get('/',async (req, res, next) => {
             const is = await t.one('select * from income_statement where is_id = 1');
 
             //select from invoice which is more than one month and marked as un-settled
-            const invoices = await t.query(`select * from invoice where settlement = false and created_at < (CURRENT_DATE - INTERVAL '30 days');`);
-            const receivable_obj = await t.one(`select sum(value) from invoice where settlement = false and created_at < (CURRENT_DATE - INTERVAL '30 days');`);
+            const invoices = await t.query(`select * from invoice where settlement = false and created_at < (CURRENT_DATE - INTERVAL '25 days');`);
+            console.log(invoices)
+            const receivable_obj = await t.one(`select sum(value) from invoice where settlement = false and created_at < (CURRENT_DATE - INTERVAL '25 days');`);
             const receivable = !!receivable_obj.sum ? parseFloat(receivable_obj.sum) : 0;
             // mark as settled
             for (const invoice of invoices) {
@@ -21,8 +22,8 @@ router.get('/',async (req, res, next) => {
             }
 
             //select from PO which is more than one month and marked as un-settled
-            const pos = await t.query(`select * from purchase_order where settlement = false and created_at < (CURRENT_DATE - INTERVAL '30 days');`);
-            const payable_obj = await t.one(`select sum(value) from purchase_order where settlement = false and created_at < (CURRENT_DATE - INTERVAL '30 days');`);
+            const pos = await t.query(`select * from purchase_order where settlement = false and created_at < (CURRENT_DATE - INTERVAL '25 days');`);
+            const payable_obj = await t.one(`select sum(value) from purchase_order where settlement = false and created_at < (CURRENT_DATE - INTERVAL '25 days');`);
             const payable = !!payable_obj.sum ? parseFloat(payable_obj.sum) : 0;
 
             // mark as settled

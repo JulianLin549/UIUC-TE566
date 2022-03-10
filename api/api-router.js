@@ -10,6 +10,6 @@ apiRouter.use('/vendor', require('./vendor'));
 apiRouter.use('/purchase-order', require('./purchase_order'));
 apiRouter.use('/settlement', require('./settlement'));
 apiRouter.use('/sheet', require('./sheet'));
-
+apiRouter.use('/part', require('./part'));
 
 module.exports = apiRouter
